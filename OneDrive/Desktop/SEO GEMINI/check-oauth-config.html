@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบ OAuth Configuration</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #d32f2f;
+            border-bottom: 3px solid #d32f2f;
+            padding-bottom: 10px;
+        }
+        .check-item {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #ccc;
+            border-radius: 4px;
+        }
+        .check-item.success {
+            border-left-color: #4caf50;
+            background: #e8f5e9;
+        }
+        .check-item.error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        .check-item.warning {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success { background: #4caf50; color: white; }
+        .status.error { background: #f44336; color: white; }
+        .status.warning { background: #ff9800; color: white; }
+        button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover { background: #1565c0; }
+        .code {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .solution {
+            background: #fff9c4;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 ตรวจสอบ OAuth Configuration</h1>
+        
+        <div class="info-box">
+            <strong>📌 หมายเหตุ:</strong> เครื่องมือนี้จะช่วยตรวจสอบว่า OAuth configuration ถูกต้องหรือไม่
+        </div>
+
+        <button onclick="runAllChecks()" style="background: #4caf50; font-size: 16px; padding: 15px 30px;">
+            ▶️ เริ่มตรวจสอบ
+        </button>
+        <button onclick="location.reload()" style="background: #ff9800;">
+            🔄 รีเซ็ต
+        </button>
+
+        <div id="results"></div>
+
+        <h2>📋 คำแนะนำ</h2>
+        <div class="info-box">
+            <ol>
+                <li>คลิก "เริ่มตรวจสอบ" เพื่อตรวจสอบ configuration</li>
+                <li>ดูผลลัพธ์แต่ละข้อ</li>
+                <li>ถ้ามีข้อผิดพลาด ให้ทำตามคำแนะนำที่แสดง</li>
+                <li>แก้ไขแล้วคลิก "รีเซ็ต" และตรวจสอบใหม่</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function runAllChecks() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>🧪 ผลการตรวจสอบ</h2>';
+
+            // Check 1: Extension Installed
+            await checkExtensionInstalled();
+
+            // Check 2: Extension ID
+            await checkExtensionId();
+
+            // Check 3: Manifest OAuth Config
+            await checkManifestOAuth();
+
+            // Check 4: Permissions
+            await checkPermissions();
+
+            // Check 5: OAuth Token
+            await checkOAuthToken();
+
+            // Check 6: Test Login
+            await checkTestLogin();
+        }
+
+        async function checkExtensionInstalled() {
+            const results = document.getElementById('results');
+            const checkDiv = document.createElement('div');
+            checkDiv.className = 'check-item';
+
+            try {
+                if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+                    checkDiv.className += ' success';
+                    checkDiv.innerHTML = `
+                        <strong>✅ Extension ติดตั้งแล้ว</strong>
+                        <span class="status success">PASS</span>
+                        <p>Extension ID: <code>${chrome.runtime.id}</code></p>
+                    `;
+                } else {
+                    throw new Error('Extension not found');
+                }
+            } catch (error) {
+                checkDiv.className += ' error';
+                checkDiv.innerHTML = `
+                    <strong>❌ Extension ไม่ได้ติดตั้ง</strong>
+                    <span class="status error">FAIL</span>
+                    <div class="solution">
+                        💡 วิธีแก้: ติดตั้ง Extension ก่อนใช้เครื่องมือนี้
+                    </div>
+                `;
+            }
+
+            results.appendChild(checkDiv);
+        }
+
+        async function checkExtensionId() {
+            const results = document.getElementById('results');
+            const checkDiv = document.createElement('div');
+            checkDiv.className = 'check-item';
+
+            try {
+                const extensionId = chrome.runtime.id;
+                const manifest = chrome.runtime.getManifest();
+
+                checkDiv.className += ' success';
+                checkDiv.innerHTML = `
+                    <strong>✅ Extension ID พร้อมใช้งาน</strong>
+                    <span class="status success">PASS</span>
+                    <div class="code">Extension ID: ${extensionId}</div>
+                    <p style="font-size: 12px; color: #666;">
+                        ⚠️ ใช้ Extension ID นี้ตอนสร้าง OAuth Client ใน Google Cloud Console
+                    </p>
+                `;
+            } catch (error) {
+                checkDiv.className += ' error';
+                checkDiv.innerHTML = `
+                    <strong>❌ ไม่สามารถอ่าน Extension ID ได้</strong>
+                    <span class="status error">FAIL</span>
+                `;
+            }
+
+            results.appendChild(checkDiv);
+        }
+
+        async function checkManifestOAuth() {
+            const results = document.getElementById('results');
+            const checkDiv = document.createElement('div');
+            checkDiv.className = 'check-item';
+
+            try {
+                const manifest = chrome.runtime.getManifest();
+
+                if (manifest.oauth2 && manifest.oauth2.client_id) {
+                    const clientId = manifest.oauth2.client_id;
+                    const scopes = manifest.oauth2.scopes || [];
+
+                    // Check if client_id looks valid
+                    if (clientId.includes('.apps.googleusercontent.com')) {
+                        checkDiv.className += ' success';
+                        checkDiv.innerHTML = `
+                            <strong>✅ OAuth Configuration ถูกต้อง</strong>
+                            <span class="status success">PASS</span>
+                            <div class="code">
+Client ID: ${clientId}
+Scopes: ${scopes.join(', ')}
+                            </div>
+                        `;
+                    } else {
+                        checkDiv.className += ' warning';
+                        checkDiv.innerHTML = `
+                            <strong>⚠️ Client ID อาจไม่ถูกต้อง</strong>
+                            <span class="status warning">WARNING</span>
+                            <p>Client ID: <code>${clientId}</code></p>
+                            <div class="solution">
+                                💡 Client ID ควรลงท้ายด้วย .apps.googleusercontent.com
+                            </div>
+                        `;
+                    }
+                } else {
+                    checkDiv.className += ' error';
+                    checkDiv.innerHTML = `
+                        <strong>❌ ไม่พบ OAuth Configuration</strong>
+                        <span class="status error">FAIL</span>
+                        <div class="solution">
+                            💡 วิธีแก้: เพิ่ม oauth2 configuration ใน manifest.json
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                checkDiv.className += ' error';
+                checkDiv.innerHTML = `
+                    <strong>❌ ไม่สามารถอ่าน Manifest ได้</strong>
+                    <span class="status error">FAIL</span>
+                `;
+            }
+
+            results.appendChild(checkDiv);
+        }
+
+        async function checkPermissions() {
+            const results = document.getElementById('results');
+            const checkDiv = document.createElement('div');
+            checkDiv.className = 'check-item';
+
+            try {
+                const manifest = chrome.runtime.getManifest();
+                const permissions = manifest.permissions || [];
+
+                const requiredPermissions = ['identity', 'storage'];
+                const missingPermissions = requiredPermissions.filter(p => !permissions.includes(p));
+
+                if (missingPermissions.length === 0) {
+                    checkDiv.className += ' success';
+                    checkDiv.innerHTML = `
+                        <strong>✅ Permissions ครบถ้วน</strong>
+                        <span class="status success">PASS</span>
+                        <p>Permissions: ${permissions.join(', ')}</p>
+                    `;
+                } else {
+                    checkDiv.className += ' error';
+                    checkDiv.innerHTML = `
+                        <strong>❌ Permissions ไม่ครบ</strong>
+                        <span class="status error">FAIL</span>
+                        <p>ขาด: ${missingPermissions.join(', ')}</p>
+                        <div class="solution">
+                            💡 วิธีแก้: เพิ่ม permissions ใน manifest.json
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                checkDiv.className += ' error';
+                checkDiv.innerHTML = `
+                    <strong>❌ ไม่สามารถตรวจสอบ Permissions ได้</strong>
+                    <span class="status error">FAIL</span>
+                `;
+            }
+
+            results.appendChild(checkDiv);
+        }
+
+        async function checkOAuthToken() {
+            const results = document.getElementById('results');
+            const checkDiv = document.createElement('div');
+            checkDiv.className = 'check-item';
+
+            try {
+                chrome.storage.local.get('youtube_auth_token', (result) => {
+                    if (result.youtube_auth_token) {
+                        checkDiv.className += ' success';
+                        checkDiv.innerHTML = `
+                            <strong>✅ มี OAuth Token</strong>
+                            <span class="status success">PASS</span>
+                            <p>Token: ${result.youtube_auth_token.substring(0, 20)}...</p>
+                            <p style="font-size: 12px; color: #666;">
+                                ✅ คุณ login แล้ว
+                            </p>
+                        `;
+                    } else {
+                        checkDiv.className += ' warning';
+                        checkDiv.innerHTML = `
+                            <strong>⚠️ ยังไม่มี OAuth Token</strong>
+                            <span class="status warning">WARNING</span>
+                            <div class="solution">
+                                💡 วิธีแก้: คลิกปุ่ม "Login with Google" ใน Extension
+                            </div>
+                        `;
+                    }
+                    results.appendChild(checkDiv);
+                });
+            } catch (error) {
+                checkDiv.className += ' error';
+                checkDiv.innerHTML = `
+                    <strong>❌ ไม่สามารถตรวจสอบ Token ได้</strong>
+                    <span class="status error">FAIL</span>
+                `;
+                results.appendChild(checkDiv);
+            }
+        }
+
+        async function checkTestLogin() {
+            const results = document.getElementById('results');
+            const checkDiv = document.createElement('div');
+            checkDiv.className = 'check-item';
+
+            checkDiv.innerHTML = `
+                <strong>🧪 ทดสอบ Login</strong>
+                <p>กำลังทดสอบ OAuth login...</p>
+            `;
+            results.appendChild(checkDiv);
+
+            try {
+                chrome.identity.getAuthToken({ interactive: false }, (token) => {
+                    if (chrome.runtime.lastError) {
+                        const error = chrome.runtime.lastError.message;
+                        
+                        if (error.includes('OAuth2')) {
+                            checkDiv.className += ' error';
+                            checkDiv.innerHTML = `
+                                <strong>❌ OAuth Configuration ผิดพลาด</strong>
+                                <span class="status error">FAIL</span>
+                                <p>Error: ${error}</p>
+                                <div class="solution">
+                                    💡 วิธีแก้:<br>
+                                    1. ตรวจสอบว่าสร้าง OAuth Client แบบ <strong>Chrome Extension</strong> (ไม่ใช่ Web Application)<br>
+                                    2. ตรวจสอบว่า Extension ID ตรงกับที่ลงทะเบียน<br>
+                                    3. ตรวจสอบว่า Client ID ใน manifest.json ถูกต้อง<br>
+                                    4. ดูคู่มือ <a href="FIX_LOGIN_ISSUE.md" target="_blank">FIX_LOGIN_ISSUE.md</a>
+                                </div>
+                            `;
+                        } else if (error.includes('not signed in')) {
+                            checkDiv.className += ' warning';
+                            checkDiv.innerHTML = `
+                                <strong>⚠️ ยังไม่ได้ Login</strong>
+                                <span class="status warning">WARNING</span>
+                                <div class="solution">
+                                    💡 วิธีแก้: เปิด Extension popup แล้วคลิก "Login with Google"
+                                </div>
+                            `;
+                        } else {
+                            checkDiv.className += ' error';
+                            checkDiv.innerHTML = `
+                                <strong>❌ Login Error</strong>
+                                <span class="status error">FAIL</span>
+                                <p>Error: ${error}</p>
+                            `;
+                        }
+                    } else if (token) {
+                        checkDiv.className += ' success';
+                        checkDiv.innerHTML = `
+                            <strong>✅ OAuth Login ทำงานได้</strong>
+                            <span class="status success">PASS</span>
+                            <p>Token: ${token.substring(0, 20)}...</p>
+                            <p style="color: #4caf50;">
+                                🎉 ทุกอย่างพร้อมใช้งาน!
+                            </p>
+                        `;
+                    } else {
+                        checkDiv.className += ' warning';
+                        checkDiv.innerHTML = `
+                            <strong>⚠️ ไม่ได้รับ Token</strong>
+                            <span class="status warning">WARNING</span>
+                            <div class="solution">
+                                💡 วิธีแก้: ลอง login ด้วย interactive mode
+                            </div>
+                        `;
+                    }
+                });
+            } catch (error) {
+                checkDiv.className += ' error';
+                checkDiv.innerHTML = `
+                    <strong>❌ ไม่สามารถทดสอบ Login ได้</strong>
+                    <span class="status error">FAIL</span>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

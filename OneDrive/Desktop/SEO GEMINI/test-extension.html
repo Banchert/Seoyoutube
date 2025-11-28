@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทดสอบ YouTube AI Optimizer Extension</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #d32f2f;
+            border-bottom: 3px solid #d32f2f;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #1976d2;
+            margin-top: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #1976d2;
+            border-radius: 4px;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success {
+            background: #4caf50;
+            color: white;
+        }
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+        .status.warning {
+            background: #ff9800;
+            color: white;
+        }
+        .status.pending {
+            background: #9e9e9e;
+            color: white;
+        }
+        button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1565c0;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .code {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .error-msg {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .success-msg {
+            color: #388e3c;
+            font-weight: bold;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 ทดสอบ YouTube AI Optimizer Extension</h1>
+        
+        <div class="info">
+            <strong>📌 หมายเหตุ:</strong> หน้านี้ใช้สำหรับทดสอบว่า Extension ทำงานได้หรือไม่ 
+            กรุณาเปิดหน้านี้ใน Chrome browser ที่ติดตั้ง Extension แล้ว
+        </div>
+
+        <h2>1. ตรวจสอบ Extension ติดตั้งแล้ว</h2>
+        <div class="test-section">
+            <div class="test-item">
+                <strong>Extension ID:</strong> 
+                <span id="extensionId" class="status pending">กำลังตรวจสอบ...</span>
+            </div>
+            <div class="test-item">
+                <strong>Manifest Version:</strong> 
+                <span id="manifestVersion" class="status pending">กำลังตรวจสอบ...</span>
+            </div>
+            <div class="test-item">
+                <strong>Permissions:</strong> 
+                <span id="permissions" class="status pending">กำลังตรวจสอบ...</span>
+            </div>
+            <button onclick="checkExtension()">🔍 ตรวจสอบ Extension</button>
+            <div id="extensionResult" class="result" style="display:none;"></div>
+        </div>
+
+        <h2>2. ตรวจสอบ Authentication</h2>
+        <div class="test-section">
+            <div class="test-item">
+                <strong>Auth Token:</strong> 
+                <span id="authStatus" class="status pending">ยังไม่ได้ตรวจสอบ</span>
+            </div>
+            <div class="test-item">
+                <strong>User Signed In:</strong> 
+                <span id="userStatus" class="status pending">ยังไม่ได้ตรวจสอบ</span>
+            </div>
+            <button onclick="checkAuth()">🔐 ตรวจสอบ Authentication</button>
+            <button onclick="testLogin()">🚀 ทดสอบ Login</button>
+            <div id="authResult" class="result" style="display:none;"></div>
+        </div>
+
+        <h2>3. ตรวจสอบ Storage</h2>
+        <div class="test-section">
+            <div class="test-item">
+                <strong>Stored Data:</strong> 
+                <span id="storageStatus" class="status pending">ยังไม่ได้ตรวจสอบ</span>
+            </div>
+            <button onclick="checkStorage()">💾 ตรวจสอบ Storage</button>
+            <button onclick="clearStorage()">🗑️ ล้าง Storage</button>
+            <div id="storageResult" class="result" style="display:none;"></div>
+        </div>
+
+        <h2>4. ตรวจสอบ YouTube API</h2>
+        <div class="test-section">
+            <div class="test-item">
+                <strong>API Connection:</strong> 
+                <span id="apiStatus" class="status pending">ยังไม่ได้ตรวจสอบ</span>
+            </div>
+            <button onclick="testYouTubeAPI()">📺 ทดสอบ YouTube API</button>
+            <div id="apiResult" class="result" style="display:none;"></div>
+        </div>
+
+        <h2>5. ตรวจสอบ Background Script</h2>
+        <div class="test-section">
+            <div class="test-item">
+                <strong>Background Status:</strong> 
+                <span id="backgroundStatus" class="status pending">ยังไม่ได้ตรวจสอบ</span>
+            </div>
+            <button onclick="testBackground()">⚙️ ทดสอบ Background</button>
+            <div id="backgroundResult" class="result" style="display:none;"></div>
+        </div>
+
+        <h2>6. ทดสอบทั้งหมดพร้อมกัน</h2>
+        <div class="test-section">
+            <button onclick="runAllTests()" style="background: #4caf50; font-size: 16px; padding: 15px 30px;">
+                ▶️ รันการทดสอบทั้งหมด
+            </button>
+            <button onclick="location.reload()" style="background: #ff9800;">
+                🔄 รีเซ็ต
+            </button>
+        </div>
+
+        <h2>📋 คำแนะนำ</h2>
+        <div class="info">
+            <ol>
+                <li>ตรวจสอบว่า Extension ติดตั้งแล้วและเปิดใช้งาน</li>
+                <li>ถ้ายังไม่ได้ login ให้คลิก "ทดสอบ Login"</li>
+                <li>หลัง login สำเร็จ ให้ทดสอบ YouTube API</li>
+                <li>ถ้าทุกอย่างผ่าน แสดงว่า Extension พร้อมใช้งาน</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // ตรวจสอบว่ามี chrome.runtime API หรือไม่
+        if (typeof chrome === 'undefined' || !chrome.runtime) {
+            alert('⚠️ กรุณาเปิดหน้านี้ใน Chrome browser');
+        }
+
+        // ฟังก์ชันตรวจสอบ Extension
+        async function checkExtension() {
+            const result = document.getElementById('extensionResult');
+            result.style.display = 'block';
+            result.innerHTML = '<p>กำลังตรวจสอบ Extension...</p>';
+
+            try {
+                // ตรวจสอบว่ามี Extension ID หรือไม่
+                const extensionId = chrome.runtime.id;
+                document.getElementById('extensionId').textContent = extensionId || 'ไม่พบ';
+                document.getElementById('extensionId').className = extensionId ? 'status success' : 'status error';
+
+                // ตรวจสอบ manifest
+                const manifest = chrome.runtime.getManifest();
+                document.getElementById('manifestVersion').textContent = 'v' + manifest.version;
+                document.getElementById('manifestVersion').className = 'status success';
+
+                // ตรวจสอบ permissions
+                const permissions = manifest.permissions.join(', ');
+                document.getElementById('permissions').textContent = permissions.length + ' permissions';
+                document.getElementById('permissions').className = 'status success';
+
+                result.innerHTML = `
+                    <p class="success-msg">✅ Extension ติดตั้งและทำงานได้ปกติ</p>
+                    <div class="code">
+Extension ID: ${extensionId}
+Name: ${manifest.name}
+Version: ${manifest.version}
+Permissions: ${manifest.permissions.join(', ')}
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `<p class="error-msg">❌ Error: ${error.message}</p>`;
+                document.getElementById('extensionId').className = 'status error';
+            }
+        }
+
+        // ฟังก์ชันตรวจสอบ Authentication
+        async function checkAuth() {
+            const result = document.getElementById('authResult');
+            result.style.display = 'block';
+            result.innerHTML = '<p>กำลังตรวจสอบ Authentication...</p>';
+
+            try {
+                // ส่งข้อความไปยัง background script
+                chrome.runtime.sendMessage({ action: 'GET_AUTH_STATUS' }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        result.innerHTML = `<p class="error-msg">❌ Error: ${chrome.runtime.lastError.message}</p>`;
+                        document.getElementById('authStatus').textContent = 'Error';
+                        document.getElementById('authStatus').className = 'status error';
+                        return;
+                    }
+
+                    if (response && response.isAuthenticated) {
+                        document.getElementById('authStatus').textContent = 'มี Token';
+                        document.getElementById('authStatus').className = 'status success';
+                        document.getElementById('userStatus').textContent = 'Signed In';
+                        document.getElementById('userStatus').className = 'status success';
+                        
+                        result.innerHTML = `
+                            <p class="success-msg">✅ Authentication สำเร็จ</p>
+                            <div class="code">Token: ${response.token ? response.token.substring(0, 20) + '...' : 'N/A'}</div>
+                        `;
+                    } else {
+                        document.getElementById('authStatus').textContent = 'ไม่มี Token';
+                        document.getElementById('authStatus').className = 'status error';
+                        document.getElementById('userStatus').textContent = 'Not Signed In';
+                        document.getElementById('userStatus').className = 'status error';
+                        
+                        result.innerHTML = `
+                            <p class="error-msg">❌ ยังไม่ได้ Login</p>
+                            <p>กรุณาคลิกปุ่ม "ทดสอบ Login" เพื่อเข้าสู่ระบบ</p>
+                        `;
+                    }
+                });
+            } catch (error) {
+                result.innerHTML = `<p class="error-msg">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // ฟังก์ชันทดสอบ Login
+        async function testLogin() {
+            const result = document.getElementById('authResult');
+            result.style.display = 'block';
+            result.innerHTML = '<p>กำลังเข้าสู่ระบบ...</p>';
+
+            try {
+                chrome.runtime.sendMessage({ action: 'LOGIN' }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        result.innerHTML = `<p class="error-msg">❌ Login Error: ${chrome.runtime.lastError.message}</p>`;
+                        return;
+                    }
+
+                    if (response && response.success) {
+                        result.innerHTML = `<p class="success-msg">✅ Login สำเร็จ!</p>`;
+                        checkAuth(); // ตรวจสอบ auth อีกครั้ง
+                    } else {
+                        result.innerHTML = `<p class="error-msg">❌ Login ล้มเหลว: ${response.error}</p>`;
+                    }
+                });
+            } catch (error) {
+                result.innerHTML = `<p class="error-msg">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // ฟังก์ชันตรวจสอบ Storage
+        async function checkStorage() {
+            const result = document.getElementById('storageResult');
+            result.style.display = 'block';
+            result.innerHTML = '<p>กำลังตรวจสอบ Storage...</p>';
+
+            try {
+                chrome.storage.local.get(null, (data) => {
+                    const keys = Object.keys(data);
+                    document.getElementById('storageStatus').textContent = keys.length + ' items';
+                    document.getElementById('storageStatus').className = keys.length > 0 ? 'status success' : 'status warning';
+
+                    result.innerHTML = `
+                        <p class="success-msg">✅ พบข้อมูล ${keys.length} รายการ</p>
+                        <div class="code">${JSON.stringify(data, null, 2)}</div>
+                    `;
+                });
+            } catch (error) {
+                result.innerHTML = `<p class="error-msg">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // ฟังก์ชันล้าง Storage
+        async function clearStorage() {
+            if (!confirm('ต้องการล้างข้อมูลทั้งหมดหรือไม่?')) return;
+
+            const result = document.getElementById('storageResult');
+            result.style.display = 'block';
+
+            try {
+                chrome.storage.local.clear(() => {
+                    result.innerHTML = '<p class="success-msg">✅ ล้างข้อมูลสำเร็จ</p>';
+                    document.getElementById('storageStatus').textContent = '0 items';
+                    document.getElementById('storageStatus').className = 'status warning';
+                });
+            } catch (error) {
+                result.innerHTML = `<p class="error-msg">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // ฟังก์ชันทดสอบ YouTube API
+        async function testYouTubeAPI() {
+            const result = document.getElementById('apiResult');
+            result.style.display = 'block';
+            result.innerHTML = '<p>กำลังทดสอบ YouTube API...</p>';
+
+            try {
+                chrome.runtime.sendMessage({ action: 'GET_CHANNEL_VIDEOS' }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        result.innerHTML = `<p class="error-msg">❌ API Error: ${chrome.runtime.lastError.message}</p>`;
+                        document.getElementById('apiStatus').textContent = 'Error';
+                        document.getElementById('apiStatus').className = 'status error';
+                        return;
+                    }
+
+                    if (response && response.success) {
+                        document.getElementById('apiStatus').textContent = 'Connected';
+                        document.getElementById('apiStatus').className = 'status success';
+                        
+                        result.innerHTML = `
+                            <p class="success-msg">✅ YouTube API ทำงานได้ปกติ</p>
+                            <p>พบวิดีโอ ${response.videos.length} รายการ</p>
+                            <div class="code">${JSON.stringify(response.videos.slice(0, 2), null, 2)}</div>
+                        `;
+                    } else {
+                        document.getElementById('apiStatus').textContent = 'Failed';
+                        document.getElementById('apiStatus').className = 'status error';
+                        result.innerHTML = `<p class="error-msg">❌ API Error: ${response.error}</p>`;
+                    }
+                });
+            } catch (error) {
+                result.innerHTML = `<p class="error-msg">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // ฟังก์ชันทดสอบ Background Script
+        async function testBackground() {
+            const result = document.getElementById('backgroundResult');
+            result.style.display = 'block';
+            result.innerHTML = '<p>กำลังทดสอบ Background Script...</p>';
+
+            try {
+                chrome.runtime.sendMessage({ action: 'GET_OPTIMIZATION_STATUS' }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        result.innerHTML = `<p class="error-msg">❌ Background Error: ${chrome.runtime.lastError.message}</p>`;
+                        document.getElementById('backgroundStatus').textContent = 'Error';
+                        document.getElementById('backgroundStatus').className = 'status error';
+                        return;
+                    }
+
+                    if (response) {
+                        document.getElementById('backgroundStatus').textContent = 'Running';
+                        document.getElementById('backgroundStatus').className = 'status success';
+                        
+                        result.innerHTML = `
+                            <p class="success-msg">✅ Background Script ทำงานได้ปกติ</p>
+                            <div class="code">
+Processing: ${response.isProcessing}
+Queue: ${response.queue ? response.queue.length : 0} videos
+Current: ${response.currentVideo ? response.currentVideo.videoId : 'None'}
+                            </div>
+                        `;
+                    }
+                });
+            } catch (error) {
+                result.innerHTML = `<p class="error-msg">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // ฟังก์ชันรันการทดสอบทั้งหมด
+        async function runAllTests() {
+            await checkExtension();
+            await new Promise(r => setTimeout(r, 500));
+            await checkAuth();
+            await new Promise(r => setTimeout(r, 500));
+            await checkStorage();
+            await new Promise(r => setTimeout(r, 500));
+            await testBackground();
+        }
+
+        // รันการตรวจสอบ Extension อัตโนมัติเมื่อโหลดหน้า
+        window.addEventListener('load', () => {
+            setTimeout(checkExtension, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 วินิจฉัยปัญหา OAuth</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #d32f2f; }
+        .test-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #ccc;
+            border-radius: 4px;
+        }
+        .test-item.pass {
+            border-left-color: #4caf50;
+            background: #e8f5e9;
+        }
+        .test-item.fail {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        .test-item.warn {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+        button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #1565c0; }
+        .code {
+            background: #263238;
+            color: #aed581;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .solution {
+            background: #fff9c4;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1976d2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 วินิจฉัยปัญหา OAuth</h1>
+        
+        <p><strong>วัตถุประสงค์:</strong> หาสาเหตุที่แท้จริงว่าทำไม login ไม่ได้</p>
+
+        <button onclick="runFullDiagnosis()" style="background: #4caf50; font-size: 18px;">
+            🚀 เริ่มวินิจฉัย
+        </button>
+        <button onclick="testLoginNow()" style="background: #ff9800;">
+            🔐 ทดสอบ Login ทันที
+        </button>
+        <button onclick="location.reload()">
+            🔄 รีเซ็ต
+        </button>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let results = document.getElementById('results');
+
+        async function runFullDiagnosis() {
+            results.innerHTML = '<h2>📊 ผลการวินิจฉัย</h2>';
+            
+            await test1_ExtensionInfo();
+            await test2_ManifestOAuth();
+            await test3_Permissions();
+            await test4_StorageCheck();
+            await test5_IdentityAPI();
+            await test6_ActualLogin();
+            
+            results.innerHTML += '<h2>🎯 สรุปผล</h2>';
+            showSummary();
+        }
+
+        async function test1_ExtensionInfo() {
+            addTest('Test 1: ข้อมูล Extension', 'กำลังตรวจสอบ...', 'loading');
+            
+            await sleep(500);
+            
+            try {
+                const extensionId = chrome.runtime.id;
+                const manifest = chrome.runtime.getManifest();
+                
+                updateTest('Test 1: ข้อมูล Extension', `
+                    <strong>✅ Extension ทำงานปกติ</strong><br>
+                    <div class="code">
+Extension ID: ${extensionId}
+Name: ${manifest.name}
+Version: ${manifest.version}
+                    </div>
+                `, 'pass');
+            } catch (error) {
+                updateTest('Test 1: ข้อมูล Extension', `
+                    <strong>❌ ไม่สามารถอ่านข้อมูล Extension ได้</strong><br>
+                    Error: ${error.message}
+                `, 'fail');
+            }
+        }
+
+        async function test2_ManifestOAuth() {
+            addTest('Test 2: OAuth Configuration', 'กำลังตรวจสอบ...', 'loading');
+            
+            await sleep(500);
+            
+            try {
+                const manifest = chrome.runtime.getManifest();
+                const oauth2 = manifest.oauth2;
+                
+                if (!oauth2) {
+                    updateTest('Test 2: OAuth Configuration', `
+                        <strong>❌ ไม่พบ oauth2 ใน manifest.json</strong>
+                        <div class="solution">
+                            💡 วิธีแก้: เพิ่ม oauth2 configuration ใน manifest.json
+                        </div>
+                    `, 'fail');
+                    return;
+                }
+                
+                const clientId = oauth2.client_id;
+                const scopes = oauth2.scopes || [];
+                
+                let issues = [];
+                
+                if (!clientId) {
+                    issues.push('❌ ไม่มี client_id');
+                } else if (!clientId.includes('.apps.googleusercontent.com')) {
+                    issues.push('⚠️ client_id อาจไม่ถูกต้อง');
+                }
+                
+                if (scopes.length === 0) {
+                    issues.push('❌ ไม่มี scopes');
+                } else if (!scopes.includes('https://www.googleapis.com/auth/youtube.force-ssl')) {
+                    issues.push('⚠️ ขาด youtube.force-ssl scope');
+                }
+                
+                if (issues.length === 0) {
+                    updateTest('Test 2: OAuth Configuration', `
+                        <strong>✅ OAuth Configuration ถูกต้อง</strong><br>
+                        <div class="code">
+Client ID: ${clientId}
+Scopes: ${scopes.length} scopes
+  - ${scopes.join('\n  - ')}
+                        </div>
+                    `, 'pass');
+                } else {
+                    updateTest('Test 2: OAuth Configuration', `
+                        <strong>⚠️ พบปัญหา OAuth Configuration</strong><br>
+                        ${issues.map(i => `<p>${i}</p>`).join('')}
+                        <div class="code">
+Client ID: ${clientId || 'N/A'}
+Scopes: ${scopes.join(', ') || 'N/A'}
+                        </div>
+                    `, 'warn');
+                }
+            } catch (error) {
+                updateTest('Test 2: OAuth Configuration', `
+                    <strong>❌ Error: ${error.message}</strong>
+                `, 'fail');
+            }
+        }
+
+        async function test3_Permissions() {
+            addTest('Test 3: Permissions', 'กำลังตรวจสอบ...', 'loading');
+            
+            await sleep(500);
+            
+            try {
+                const manifest = chrome.runtime.getManifest();
+                const permissions = manifest.permissions || [];
+                
+                const required = ['identity', 'storage'];
+                const missing = required.filter(p => !permissions.includes(p));
+                
+                if (missing.length === 0) {
+                    updateTest('Test 3: Permissions', `
+                        <strong>✅ Permissions ครบถ้วน</strong><br>
+                        Permissions: ${permissions.join(', ')}
+                    `, 'pass');
+                } else {
+                    updateTest('Test 3: Permissions', `
+                        <strong>❌ Permissions ไม่ครบ</strong><br>
+                        ขาด: ${missing.join(', ')}
+                    `, 'fail');
+                }
+            } catch (error) {
+                updateTest('Test 3: Permissions', `
+                    <strong>❌ Error: ${error.message}</strong>
+                `, 'fail');
+            }
+        }
+
+        async function test4_StorageCheck() {
+            addTest('Test 4: Storage & Token', 'กำลังตรวจสอบ...', 'loading');
+            
+            await sleep(500);
+            
+            try {
+                chrome.storage.local.get(null, (data) => {
+                    const hasToken = !!data.youtube_auth_token;
+                    
+                    if (hasToken) {
+                        updateTest('Test 4: Storage & Token', `
+                            <strong>✅ มี Token ใน Storage</strong><br>
+                            Token: ${data.youtube_auth_token.substring(0, 30)}...<br>
+                            <p style="color: #4caf50;">✅ คุณเคย login สำเร็จแล้ว</p>
+                        `, 'pass');
+                    } else {
+                        updateTest('Test 4: Storage & Token', `
+                            <strong>⚠️ ไม่มี Token ใน Storage</strong><br>
+                            <p>คุณยังไม่เคย login สำเร็จ หรือ token ถูกลบ</p>
+                            <div class="solution">
+                                💡 ต้อง login ใหม่
+                            </div>
+                        `, 'warn');
+                    }
+                });
+            } catch (error) {
+                updateTest('Test 4: Storage & Token', `
+                    <strong>❌ Error: ${error.message}</strong>
+                `, 'fail');
+            }
+        }
+
+        async function test5_IdentityAPI() {
+            addTest('Test 5: Identity API (Non-Interactive)', 'กำลังทดสอบ...', 'loading');
+            
+            await sleep(500);
+            
+            try {
+                chrome.identity.getAuthToken({ interactive: false }, (token) => {
+                    if (chrome.runtime.lastError) {
+                        const error = chrome.runtime.lastError.message;
+                        
+                        updateTest('Test 5: Identity API (Non-Interactive)', `
+                            <strong>❌ ไม่สามารถรับ Token ได้</strong><br>
+                            <div class="code">Error: ${error}</div>
+                            <div class="solution">
+                                <strong>🔍 วิเคราะห์ Error:</strong><br>
+                                ${analyzeError(error)}
+                            </div>
+                        `, 'fail');
+                    } else if (token) {
+                        updateTest('Test 5: Identity API (Non-Interactive)', `
+                            <strong>✅ รับ Token สำเร็จ!</strong><br>
+                            Token: ${token.substring(0, 30)}...<br>
+                            <p style="color: #4caf50;">🎉 OAuth ทำงานได้ปกติ!</p>
+                        `, 'pass');
+                    } else {
+                        updateTest('Test 5: Identity API (Non-Interactive)', `
+                            <strong>⚠️ ไม่มี Cached Token</strong><br>
+                            <p>ต้อง login แบบ interactive</p>
+                        `, 'warn');
+                    }
+                });
+            } catch (error) {
+                updateTest('Test 5: Identity API (Non-Interactive)', `
+                    <strong>❌ Error: ${error.message}</strong>
+                `, 'fail');
+            }
+        }
+
+        async function test6_ActualLogin() {
+            addTest('Test 6: ทดสอบ Login จริง (Interactive)', 'พร้อมทดสอบ...', 'warn');
+            
+            updateTest('Test 6: ทดสอบ Login จริง (Interactive)', `
+                <strong>⏸️ รอคำสั่ง</strong><br>
+                <p>คลิกปุ่ม "ทดสอบ Login ทันที" เพื่อทดสอบ login แบบ interactive</p>
+                <button onclick="testLoginNow()" style="background: #ff9800; padding: 10px 20px; border: none; border-radius: 4px; color: white; cursor: pointer;">
+                    🔐 ทดสอบ Login ทันที
+                </button>
+            `, 'warn');
+        }
+
+        async function testLoginNow() {
+            updateTest('Test 6: ทดสอบ Login จริง (Interactive)', `
+                <strong>🔄 กำลัง Login...</strong><br>
+                <div class="loading"></div>
+                <p>กรุณารอ popup OAuth จาก Google...</p>
+            `, 'loading');
+            
+            try {
+                chrome.identity.getAuthToken({ interactive: true }, (token) => {
+                    if (chrome.runtime.lastError) {
+                        const error = chrome.runtime.lastError.message;
+                        
+                        updateTest('Test 6: ทดสอบ Login จริง (Interactive)', `
+                            <strong>❌ Login ล้มเหลว!</strong><br>
+                            <div class="code">Error: ${error}</div>
+                            <div class="solution">
+                                <strong>🔍 สาเหตุและวิธีแก้:</strong><br>
+                                ${analyzeError(error)}
+                            </div>
+                        `, 'fail');
+                    } else if (token) {
+                        updateTest('Test 6: ทดสอบ Login จริง (Interactive)', `
+                            <strong>✅ Login สำเร็จ!</strong><br>
+                            Token: ${token.substring(0, 30)}...<br>
+                            <p style="color: #4caf50; font-size: 18px;">🎉 ทุกอย่างทำงานได้แล้ว!</p>
+                            <div class="solution" style="background: #e8f5e9;">
+                                ✅ คุณสามารถใช้ Extension ได้แล้ว!<br>
+                                ลองเปิด Extension popup แล้วคลิก Login with Google
+                            </div>
+                        `, 'pass');
+                        
+                        // Save token
+                        chrome.storage.local.set({ youtube_auth_token: token });
+                    } else {
+                        updateTest('Test 6: ทดสอบ Login จริง (Interactive)', `
+                            <strong>⚠️ ไม่ได้รับ Token</strong><br>
+                            <p>Login ถูกยกเลิก หรือมีปัญหา</p>
+                        `, 'warn');
+                    }
+                });
+            } catch (error) {
+                updateTest('Test 6: ทดสอบ Login จริง (Interactive)', `
+                    <strong>❌ Error: ${error.message}</strong>
+                `, 'fail');
+            }
+        }
+
+        function analyzeError(error) {
+            if (error.includes('OAuth2') || error.includes('bad client')) {
+                return `
+                    <strong>สาเหตุ:</strong> OAuth Client ID ไม่ถูกต้อง<br>
+                    <strong>วิธีแก้:</strong><br>
+                    1. ตรวจสอบว่าสร้าง OAuth Client แบบ <strong>Chrome Extension</strong> (ไม่ใช่ Web App)<br>
+                    2. ตรวจสอบว่า Extension ID ตรงกัน: <code>${chrome.runtime.id}</code><br>
+                    3. ตรวจสอบว่า Client ID ใน manifest.json ถูกต้อง
+                `;
+            } else if (error.includes('not signed in') || error.includes('user is not signed')) {
+                return `
+                    <strong>สาเหตุ:</strong> OAuth Consent Screen ไม่ได้ setup หรือ Test users ไม่ได้เพิ่ม<br>
+                    <strong>วิธีแก้:</strong><br>
+                    1. ไปที่ <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank">OAuth Consent Screen</a><br>
+                    2. ตรวจสอบว่า setup แล้ว (User Type: External)<br>
+                    3. ตรวจสอบว่าเพิ่ม Scopes แล้ว (youtube.force-ssl, youtube.upload)<br>
+                    4. <strong>ตรวจสอบว่าเพิ่ม Test users แล้ว</strong> (email ของคุณ)<br>
+                    5. รอ 2-3 นาที แล้วลองใหม่
+                `;
+            } else if (error.includes('cancelled')) {
+                return `
+                    <strong>สาเหตุ:</strong> คุณยกเลิกการ login<br>
+                    <strong>วิธีแก้:</strong> ลอง login อีกครั้งและอนุญาตสิทธิ์ทั้งหมด
+                `;
+            } else if (error.includes('network')) {
+                return `
+                    <strong>สาเหตุ:</strong> ปัญหาการเชื่อมต่ออินเทอร์เน็ต<br>
+                    <strong>วิธีแก้:</strong> ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต
+                `;
+            } else {
+                return `
+                    <strong>สาเหตุ:</strong> ${error}<br>
+                    <strong>วิธีแก้:</strong> ดูคู่มือ SETUP_OAUTH_STEP_BY_STEP.md
+                `;
+            }
+        }
+
+        function showSummary() {
+            const passCount = document.querySelectorAll('.test-item.pass').length;
+            const failCount = document.querySelectorAll('.test-item.fail').length;
+            const warnCount = document.querySelectorAll('.test-item.warn').length;
+            
+            let summary = '<div class="test-item">';
+            
+            if (failCount === 0 && warnCount === 0) {
+                summary += `
+                    <strong style="color: #4caf50; font-size: 18px;">✅ ทุกอย่างปกติ!</strong><br>
+                    <p>Extension พร้อมใช้งาน ลองเปิด popup แล้ว login ดู</p>
+                `;
+            } else if (failCount > 0) {
+                summary += `
+                    <strong style="color: #f44336; font-size: 18px;">❌ พบปัญหา ${failCount} ข้อ</strong><br>
+                    <p>กรุณาแก้ไขปัญหาที่มีเครื่องหมาย ❌ ด้านบน</p>
+                `;
+            } else {
+                summary += `
+                    <strong style="color: #ff9800; font-size: 18px;">⚠️ พบข้อควรระวัง ${warnCount} ข้อ</strong><br>
+                    <p>ลองทดสอบ login ดู</p>
+                `;
+            }
+            
+            summary += '</div>';
+            results.innerHTML += summary;
+        }
+
+        function addTest(title, content, status) {
+            const div = document.createElement('div');
+            div.className = `test-item ${status}`;
+            div.id = 'test-' + title.replace(/\s+/g, '-');
+            div.innerHTML = `<strong>${title}</strong><br>${content}`;
+            results.appendChild(div);
+        }
+
+        function updateTest(title, content, status) {
+            const div = document.getElementById('test-' + title.replace(/\s+/g, '-'));
+            if (div) {
+                div.className = `test-item ${status}`;
+                div.innerHTML = `<strong>${title}</strong><br>${content}`;
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>

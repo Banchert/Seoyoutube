@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube AI Optimizer - Screenshots</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .screenshot {
+            width: 1280px;
+            height: 800px;
+            background: white;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .screenshot-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .screenshot-2 {
+            background: #fff;
+            flex-direction: column;
+        }
+        
+        .screenshot-3 {
+            background: #f8f9fa;
+            flex-direction: column;
+        }
+        
+        .screenshot-4 {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+        }
+        
+        .screenshot-5 {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+        }
+        
+        .extension-popup {
+            width: 400px;
+            height: 600px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 20px;
+            color: #333;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        
+        .feature-list {
+            text-align: left;
+            font-size: 1.2rem;
+            line-height: 2;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            margin: 10px;
+            cursor: pointer;
+        }
+        
+        .video-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 10px 0;
+            background: white;
+        }
+        
+        .video-thumbnail {
+            width: 120px;
+            height: 90px;
+            background: #ff0000;
+            border-radius: 5px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            width: 65%;
+            animation: progress 2s ease-in-out infinite;
+        }
+        
+        @keyframes progress {
+            0%, 100% { width: 65%; }
+            50% { width: 85%; }
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Screenshot 1: Main Interface -->
+    <div class="screenshot screenshot-1">
+        <div>
+            <div class="title">🎬 YouTube AI Optimizer</div>
+            <div class="subtitle">Transform Your Channel with AI</div>
+            <div class="feature-list">
+                ✨ AI-Generated SEO Content<br>
+                🎨 Custom Thumbnail Creation<br>
+                📊 Bulk Video Optimization<br>
+                🚀 Boost Your Views & Engagement
+            </div>
+            <button class="btn">Get Started Now</button>
+        </div>
+    </div>
+
+    <!-- Screenshot 2: Extension Popup -->
+    <div class="screenshot screenshot-2">
+        <h2 style="margin-bottom: 30px; color: #333;">Extension Interface</h2>
+        <div class="extension-popup">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #667eea;">🎬 YouTube AI Optimizer</h1>
+                <p style="color: #666;">Optimize your videos with AI</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <div style="color: #28a745; font-weight: bold;">✅ Authenticated</div>
+                <div style="color: #666; font-size: 0.9rem;">Ready to optimize your videos</div>
+            </div>
+            
+            <button class="btn" style="width: 100%; margin: 10px 0;">🔄 Load My Videos</button>
+            <button class="btn" style="width: 100%; margin: 10px 0;">✨ Start Optimization</button>
+            
+            <div style="margin-top: 30px; font-size: 0.9rem; color: #666;">
+                <div>📹 25 videos found</div>
+                <div>🎯 3 videos selected</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot 3: Video List -->
+    <div class="screenshot screenshot-3">
+        <h2 style="margin-bottom: 30px; color: #333;">Your YouTube Videos</h2>
+        <div style="width: 90%; max-width: 800px;">
+            <div class="video-item">
+                <div class="video-thumbnail">📹</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">How to Create Amazing Content</div>
+                    <div style="color: #666; font-size: 0.9rem;">Published 2 days ago • 1.2K views</div>
+                    <div style="color: #28a745; font-size: 0.9rem;">✅ Ready for optimization</div>
+                </div>
+                <input type="checkbox" checked style="margin-left: 15px;">
+            </div>
+            
+            <div class="video-item">
+                <div class="video-thumbnail">🎥</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">Ultimate YouTube SEO Guide</div>
+                    <div style="color: #666; font-size: 0.9rem;">Published 1 week ago • 5.8K views</div>
+                    <div style="color: #ffc107; font-size: 0.9rem;">⚡ Needs optimization</div>
+                </div>
+                <input type="checkbox" checked style="margin-left: 15px;">
+            </div>
+            
+            <div class="video-item">
+                <div class="video-thumbnail">🎬</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">AI Tools for Content Creators</div>
+                    <div style="color: #666; font-size: 0.9rem;">Published 3 days ago • 892 views</div>
+                    <div style="color: #dc3545; font-size: 0.9rem;">🔴 Low performance</div>
+                </div>
+                <input type="checkbox" checked style="margin-left: 15px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot 4: AI Processing -->
+    <div class="screenshot screenshot-4">
+        <div style="text-align: center;">
+            <div class="title">🤖 AI Processing</div>
+            <div class="subtitle">Optimizing Your Videos...</div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            
+            <div style="font-size: 1.3rem; margin: 30px 0;">
+                ✨ Generating SEO-optimized titles<br>
+                📝 Creating engaging descriptions<br>
+                🏷️ Selecting relevant tags<br>
+                🎨 Designing custom thumbnails
+            </div>
+            
+            <div style="font-size: 1.1rem; opacity: 0.9;">
+                Processing video 2 of 3...
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot 5: Results -->
+    <div class="screenshot screenshot-5">
+        <div style="text-align: center;">
+            <div class="title">🎉 Optimization Complete!</div>
+            <div class="subtitle">Your Videos Are Now Supercharged</div>
+            
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number">+127%</span>
+                    <span class="stat-label">Views Increase</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">+89%</span>
+                    <span class="stat-label">Click-Through Rate</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">3</span>
+                    <span class="stat-label">Videos Optimized</span>
+                </div>
+            </div>
+            
+            <div style="font-size: 1.2rem; margin: 30px 0;">
+                ✅ SEO titles updated<br>
+                ✅ Descriptions enhanced<br>
+                ✅ Tags optimized<br>
+                ✅ Custom thumbnails uploaded
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Instructions for taking screenshots
+        console.log(`
+📸 Screenshot Instructions:
+
+1. Open this page in Chrome
+2. Press F11 for fullscreen
+3. Use screenshot tool to capture each section (1280x800px)
+4. Save as:
+   - screenshot-1-main-interface.png
+   - screenshot-2-extension-popup.png
+   - screenshot-3-video-list.png
+   - screenshot-4-ai-processing.png
+   - screenshot-5-results.png
+
+5. Upload to Chrome Web Store submission
+        `);
+    </script>
+</body>
+</html>

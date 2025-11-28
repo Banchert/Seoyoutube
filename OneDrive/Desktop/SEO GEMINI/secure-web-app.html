@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube AI Optimizer - Secure Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .setup-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .videos-section {
+            display: none;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎬</div>
+        <h1>YouTube AI Optimizer</h1>
+        <p class="subtitle">Secure Version - No Client Secret Required</p>
+
+        <div id="setup-section" class="setup-section">
+            <h3>🔧 Quick Setup</h3>
+            <p>ใส่ Client ID ของคุณเอง (ไม่ต้อง Client Secret)</p>
+            
+            <div class="input-group">
+                <label>Google OAuth Client ID:</label>
+                <input type="text" id="clientId" placeholder="862891517207-xxxxxxx.apps.googleusercontent.com">
+                <small style="color: #666;">
+                    ไม่มี Client ID? <a href="#" onclick="showInstructions()">คลิกที่นี่เพื่อดูวิธีสร้าง</a>
+                </small>
+            </div>
+            
+            <button class="btn" onclick="saveAndLogin()">
+                🔐 Save & Login
+            </button>
+        </div>
+
+        <div id="auth-section" style="display: none;">
+            <button class="btn" onclick="login()">
+                🔐 Login with Google
+            </button>
+            <button class="btn" onclick="showSetup()">
+                ⚙️ Change Settings
+            </button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div id="videos-section" class="videos-section">
+            <h3>Your YouTube Videos</h3>
+            <p>🎉 OAuth setup successful! Ready to optimize your videos.</p>
+            
+            <button class="btn" onclick="loadVideos()">
+                📹 Load My Videos
+            </button>
+        </div>
+
+        <div id="instructions" style="display: none; background: #e3f2fd; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: left;">
+            <h4>📋 วิธีสร้าง OAuth Client ID:</h4>
+            <ol>
+                <li>ไปที่: <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a></li>
+                <li>คลิก "+ CREATE CREDENTIALS" → "OAuth client ID"</li>
+                <li><strong>Application type:</strong> Web application</li>
+                <li><strong>Name:</strong> YouTube AI Optimizer</li>
+                <li><strong>Authorized redirect URIs:</strong> <code>https://banchert.github.io/Seoyoutube/</code></li>
+                <li>คลิก "CREATE" และคัดลอก Client ID</li>
+            </ol>
+            <button class="btn" onclick="hideInstructions()">✅ เข้าใจแล้ว</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let CLIENT_ID = null;
+        let accessToken = null;
+
+        // Initialize
+        function initApp() {
+            const savedClientId = localStorage.getItem('user_client_id');
+            if (savedClientId) {
+                CLIENT_ID = savedClientId;
+                document.getElementById('clientId').value = savedClientId;
+                showAuthSection();
+                
+                // Check for OAuth callback
+                checkOAuthCallback();
+            }
+        }
+
+        function saveAndLogin() {
+            const clientId = document.getElementById('clientId').value.trim();
+            
+            if (!clientId) {
+                showStatus('❌ กรุณาใส่ Client ID', 'error');
+                return;
+            }
+            
+            if (!clientId.includes('.apps.googleusercontent.com')) {
+                showStatus('❌ Client ID ไม่ถูกต้อง', 'error');
+                return;
+            }
+            
+            CLIENT_ID = clientId;
+            localStorage.setItem('user_client_id', clientId);
+            
+            showStatus('✅ Client ID saved successfully!', 'success');
+            showAuthSection();
+        }
+
+        function showAuthSection() {
+            document.getElementById('setup-section').style.display = 'none';
+            document.getElementById('auth-section').style.display = 'block';
+        }
+
+        function showSetup() {
+            document.getElementById('setup-section').style.display = 'block';
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('videos-section').style.display = 'none';
+        }
+
+        function login() {
+            if (!CLIENT_ID) {
+                showStatus('❌ กรุณา setup Client ID ก่อน', 'error');
+                return;
+            }
+
+            const REDIRECT_URI = window.location.href.split('?')[0];
+            const SCOPES = 'https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/youtube.upload';
+
+            // ใช้ Implicit Flow (ไม่ต้อง Client Secret)
+            const authUrl = `https://accounts.google.com/oauth/authorize?` +
+                `client_id=${CLIENT_ID}&` +
+                `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
+                `scope=${encodeURIComponent(SCOPES)}&` +
+                `response_type=token&` +  // ← ใช้ token แทน code
+                `access_type=offline`;
+            
+            window.location.href = authUrl;
+        }
+
+        function checkOAuthCallback() {
+            // Check for access token in URL hash (Implicit Flow)
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const token = params.get('access_token');
+            
+            if (token) {
+                accessToken = token;
+                localStorage.setItem('youtube_access_token', token);
+                
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                showStatus('✅ Authentication successful!', 'success');
+                document.getElementById('videos-section').style.display = 'block';
+                document.getElementById('auth-section').style.display = 'none';
+            } else {
+                // Check for stored token
+                const storedToken = localStorage.getItem('youtube_access_token');
+                if (storedToken) {
+                    accessToken = storedToken;
+                    document.getElementById('videos-section').style.display = 'block';
+                    document.getElementById('auth-section').style.display = 'none';
+                    showStatus('✅ Welcome back!', 'success');
+                }
+            }
+        }
+
+        function loadVideos() {
+            if (!accessToken) {
+                showStatus('❌ Please login first', 'error');
+                return;
+            }
+            
+            showStatus('📹 Loading your YouTube videos...', 'success');
+            
+            // Here you would implement the YouTube API calls
+            // using the accessToken (same as before)
+        }
+
+        function showInstructions() {
+            document.getElementById('instructions').style.display = 'block';
+        }
+
+        function hideInstructions() {
+            document.getElementById('instructions').style.display = 'none';
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.innerHTML = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube AI Optimizer",
+  "version": "1.0.0",
+  "description": "Automate YouTube video SEO and thumbnail generation using AI",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "downloads",
+    "tabs",
+    "identity",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://youtube.com/*",
+    "https://gemini.google.com/*",
+    "https://ai.google.dev/*",
+    "https://*.googleapis.com/*",
+    "https://*.googleusercontent.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube AI Optimizer"
+  },
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://youtube.com/*"
+      ],
+      "js": ["src/content-youtube.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://gemini.google.com/*",
+        "https://ai.google.dev/*"
+      ],
+      "js": ["src/content-gemini.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "assets/icon-16.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsgVnDCy19NOszBP2g5GE+cWOOz7LFxzaBh8eVFqvDxmCSBJwGMcEe18rNYHJa2Cgi5vJbOh7oJ+UNbMNONh+huVayaVbPlXvwfuri/32b9zM9ZpNBcZn+mOmBxvP7bAvxAHFTux5PGJPFYJAbhWRgLNBuRZzbJpTClIBj/6yLCV2SbIQAgLcEWFYPNC2C5ME6jAT+V46RgUEj8FoUNShlJroVdoqE1fmha9aT/WQad27b9U/haGcEPfkaAe9IrxrBweo5XjZ9etL7wyfeGAd+i1Fr3/4TGG+owIoua7wEWVNEM7645umJew74d/zuD5l1Eh0i5nkyjodhpsqUpNK7QIDAQAB",
+  "oauth2": {
+    "client_id": "862891517207-47ds5n9cbqssschcsbtt12fg66egki69.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/youtube.force-ssl",
+      "https://www.googleapis.com/auth/youtube.upload"
+    ]
+  }
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube AI Optimizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>🎬 YouTube AI Optimizer</h1>
+                <p class="subtitle">Optimize your videos with AI</p>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Authentication Section -->
+            <section id="authSection" class="section">
+                <div class="auth-status" id="authStatus">
+                    <div class="status-indicator" id="statusIndicator">🔒</div>
+                    <span id="statusText">Checking authentication...</span>
+                </div>
+                
+                <div id="statusMessage" class="status-message info">พร้อมใช้งาน</div>
+                
+                <div class="auth-buttons">
+                    <button id="loginBtn" class="btn btn-primary">
+                        <span class="btn-icon">🔐</span>
+                        Login with Google
+                    </button>
+                    <button id="logoutBtn" class="btn btn-secondary" style="display: none;">
+                        <span class="btn-icon">🚪</span>
+                        Logout
+                    </button>
+                </div>
+            </section>
+
+            <!-- Main Section -->
+            <section id="mainSection" class="section" style="display: none;">
+                <h2>📹 Select Videos to Optimize</h2>
+                
+                <div class="video-controls">
+                    <button id="refreshBtn" class="btn btn-secondary">
+                        <span class="btn-icon">🔄</span>
+                        Load My Videos
+                    </button>
+                    <button id="selectAllBtn" class="btn btn-outline">Select All</button>
+                    <button id="deselectAllBtn" class="btn btn-outline">Clear All</button>
+                    <input type="text" id="searchBox" placeholder="Search videos..." class="search-box">
+                </div>
+
+                <div class="video-stats">
+                    <span id="videoCount">0 videos</span> | 
+                    <span id="selectedCount">0 selected</span>
+                </div>
+
+                <div id="videoList" class="video-list">
+                    <div class="loading" id="videoLoading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Loading your videos...</p>
+                    </div>
+                </div>
+
+                <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+                    <button id="loadMoreBtn" class="btn btn-outline">Load More Videos</button>
+                </div>
+            </section>
+
+            <!-- Optimization Section -->
+            <section id="optimizationSection" class="section" style="display: none;">
+                <h2>🚀 Start Optimization</h2>
+                
+                <div class="optimization-controls">
+                    <button id="optimizeBtn" class="btn btn-success">
+                        <span class="btn-icon">✨</span>
+                        Start AI Optimization
+                    </button>
+                    <span id="optimizeCount">0 videos selected</span>
+                </div>
+
+                <div class="settings">
+                    <label>
+                        <input type="checkbox" id="autoCloseTabs" checked>
+                        Auto-close tabs when done
+                    </label>
+                    <label>
+                        <input type="checkbox" id="notifyOnComplete" checked>
+                        Notify when complete
+                    </label>
+                </div>
+
+                <div id="progressBar" class="progress-bar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-text" id="progressText">Preparing...</div>
+                </div>
+
+                <div id="optimizationResults" class="results" style="display: none;">
+                    <h3>📊 Optimization Results</h3>
+                    <div id="resultsList" class="results-list"></div>
+                </div>
+            </section>
+
+            <!-- Debug Section -->
+            <section id="debugSection" class="section debug-section">
+                <h2>🔧 Debug Tools</h2>
+                <div class="debug-buttons">
+                    <button id="diagnoseBtn" class="btn btn-outline">
+                        <span class="btn-icon">🔍</span>
+                        Diagnose Issues
+                    </button>
+                    <button id="testLoginBtn" class="btn btn-outline">
+                        <span class="btn-icon">🧪</span>
+                        Test Login
+                    </button>
+                    <button id="debugInfoBtn" class="btn btn-outline">
+                        <span class="btn-icon">📊</span>
+                        Show Debug Info
+                    </button>
+                    <button id="forceLoginBtn" class="btn btn-warning">
+                        <span class="btn-icon">🚀</span>
+                        Force Login
+                    </button>
+                    <button id="ultimateFixBtn" class="btn btn-danger">
+                        <span class="btn-icon">🔥</span>
+                        Ultimate Fix
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Made with ❤️ for YouTube Creators</p>
+        </footer>
+    </div>
+
+    <script type="module" src="src/popup.js"></script>
+</body>
+</html>
